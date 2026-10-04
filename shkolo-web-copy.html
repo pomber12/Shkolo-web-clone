@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Школо – Електронен дневник</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a73e8;
+      --primary-dark: #1557b0;
+      --primary-light: #e8f0fe;
+      --success: #34a853;
+      --warning: #f9ab00;
+      --danger: #ea4335;
+      --bg: #f0f2f5;
+      --card: #ffffff;
+      --sidebar: #ffffff;
+      --text: #202124;
+      --text-secondary: #5f6368;
+      --border: #e0e3e7;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #1a73e8, #4285f4);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 20px; font-weight: 700;
+    }
+
+    .logo-text { font-size: 22px; font-weight: 700; color: var(--primary); }
+
+    .student-card {
+      margin: 16px 12px;
+      padding: 14px;
+      background: var(--primary-light);
+      border-radius: 14px;
+      display: flex; align-items: center; gap: 12px;
+      cursor: pointer;
+    }
+
+    .student-card:hover { background: #d2e3fc; }
+
+    .avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4285f4, #1a73e8);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px; flex-shrink: 0;
+    }
+
+    .student-info h3 { font-size: 14px; font-weight: 600; }
+    .student-info p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    .nav-menu { flex: 1; padding: 8px 12px; overflow-y: auto; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-weight: 500; font-size: 14px;
+      transition: all 0.15s;
+      margin-bottom: 2px;
+      border: none; background: none;
+      width: 100%; text-align: left;
+    }
+
+    .nav-item:hover { background: var(--bg); color: var(--text); }
+    .nav-item.active { background: var(--primary-light); color: var(--primary); }
+    .nav-item .icon { font-size: 20px; width: 24px; text-align: center; }
+    .nav-item .badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: white;
+      font-size: 11px; font-weight: 700;
+      padding: 2px 7px; border-radius: 10px;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px; color: var(--text-secondary);
+      text-align: center;
+    }
+
+    /* MAIN */
+    .main {
+      margin-left: 260px;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 32px;
+      display: flex; justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 50;
+    }
+
+    .topbar h1 { font-size: 22px; font-weight: 600; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 16px; }
+
+    .search-box {
+      display: flex; align-items: center;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 8px 14px; gap: 8px;
+      width: 280px;
+    }
+
+    .search-box input {
+      border: none; background: transparent; outline: none;
+      font-size: 14px; width: 100%; font-family: inherit;
+    }
+
+    .icon-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; position: relative; font-size: 18px;
+    }
+
+    .icon-btn:hover { background: var(--border); }
+
+    .icon-btn .badge {
+      position: absolute; top: 4px; right: 4px;
+      width: 16px; height: 16px;
+      background: var(--danger); color: white;
+      font-size: 10px; font-weight: 700;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .content { padding: 28px 32px; flex: 1; }
+
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.25s ease; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Stats */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex; align-items: center; gap: 16px;
+    }
+
+    .stat-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+
+    .stat-value { font-size: 28px; font-weight: 700; line-height: 1.1; }
+    .stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+    .stat-value.good { color: var(--success); }
+    .stat-value.warn { color: var(--warning); }
+    .stat-value.bad { color: var(--danger); }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-title { font-size: 16px; font-weight: 600; }
+    .card-link {
+      color: var(--primary); font-size: 13px; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+    }
+    .card-link:hover { text-decoration: underline; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    /* Grade items */
+    .grade-item {
+      display: flex; align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .grade-item:last-child { border-bottom: none; }
+
+    .grade-circle {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 20px; color: white;
+      margin-right: 16px; flex-shrink: 0;
+    }
+
+    .grade-6 { background: linear-gradient(135deg, #34a853, #0f9d58); }
+    .grade-5 { background: linear-gradient(135deg, #4285f4, #1a73e8); }
+    .grade-4 { background: linear-gradient(135deg, #fbbc04, #f9ab00); }
+    .grade-3 { background: linear-gradient(135deg, #ea4335, #d93025); }
+    .grade-2 { background: linear-gradient(135deg, #9aa0a6, #5f6368); }
+
+    .grade-info { flex: 1; min-width: 0; }
+    .grade-subject { font-weight: 600; font-size: 15px; margin-bottom: 3px; }
+    .grade-meta { font-size: 13px; color: var(--text-secondary); }
+    .grade-date { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
+
+    .grade-delete {
+      background: none; border: none; color: var(--text-secondary);
+      cursor: pointer; font-size: 16px; padding: 6px 10px;
+      border-radius: 8px; opacity: 0; transition: opacity 0.15s;
+    }
+    .grade-item:hover .grade-delete { opacity: 1; }
+    .grade-delete:hover { background: #fce8e6; color: var(--danger); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 14px; font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { background: var(--border); }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      display: none;
+      align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 440px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+      background: white;
+    }
+
+    .form-group select:focus,
+    .form-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26,115,232,0.15);
+    }
+
+    .grade-picker {
+      display: flex;
+      gap: 8px;
+    }
+
+    .grade-picker button {
+      flex: 1;
+      padding: 12px 0;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .grade-picker button:hover { border-color: var(--primary); }
+    .grade-picker button.selected {
+      border-color: transparent;
+      color: white;
+    }
+    .grade-picker button[data-g="6"].selected { background: linear-gradient(135deg, #34a853, #0f9d58); }
+    .grade-picker button[data-g="5"].selected { background: linear-gradient(135deg, #4285f4, #1a73e8); }
+    .grade-picker button[data-g="4"].selected { background: linear-gradient(135deg, #fbbc04, #f9ab00); }
+    .grade-picker button[data-g="3"].selected { background: linear-gradient(135deg, #ea4335, #d93025); }
+    .grade-picker button[data-g="2"].selected { background: linear-gradient(135deg, #9aa0a6, #5f6368); }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      background: #202124;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 2000;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* Schedule */
+    .day-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+
+    .day-tab {
+      padding: 10px 20px;
+      border-radius: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      font-size: 14px; font-weight: 500;
+      cursor: pointer; text-align: center;
+    }
+    .day-tab:hover { border-color: var(--primary); }
+    .day-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .day-tab .day-name { font-size: 12px; opacity: 0.85; }
+    .day-tab .day-num { font-size: 18px; font-weight: 700; }
+
+    .lesson-item {
+      display: flex; gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: flex-start;
+    }
+    .lesson-item:last-child { border-bottom: none; }
+
+    .lesson-time { width: 70px; flex-shrink: 0; text-align: right; }
+    .lesson-time .hour { font-weight: 700; font-size: 15px; }
+    .lesson-time .min { font-size: 12px; color: var(--text-secondary); }
+
+    .lesson-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      margin-top: 6px; flex-shrink: 0;
+      position: relative;
+    }
+    .lesson-dot::after {
+      content: '';
+      position: absolute; top: 12px; left: 5px;
+      width: 2px; height: 50px;
+      background: var(--border);
+    }
+    .lesson-item:last-child .lesson-dot::after { display: none; }
+
+    .lesson-content { flex: 1; }
+    .lesson-subject { font-weight: 600; font-size: 15px; margin-bottom: 3px; }
+    .lesson-teacher { font-size: 13px; color: var(--text-secondary); }
+    .lesson-room {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 12px; font-weight: 600;
+      padding: 3px 10px; border-radius: 6px;
+      margin-top: 6px;
+    }
+
+    /* Absences */
+    .absence-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .absence-item:last-child { border-bottom: none; }
+    .absence-left { display: flex; align-items: center; gap: 14px; }
+    .absence-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .absence-icon.excused { background: #e6f4ea; }
+    .absence-icon.unexcused { background: #fce8e6; }
+    .absence-info h4 { font-size: 15px; font-weight: 600; }
+    .absence-info p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+    .absence-status {
+      font-size: 13px; font-weight: 600;
+      padding: 5px 12px; border-radius: 20px;
+    }
+    .absence-status.excused { background: #e6f4ea; color: #137333; }
+    .absence-status.unexcused { background: #fce8e6; color: #c5221f; }
+
+    /* Notifications */
+    .notif-item {
+      display: flex; gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item.unread {
+      background: var(--primary-light);
+      margin: 0 -24px; padding: 16px 24px;
+      border-radius: 10px;
+    }
+    .notif-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .notif-content { flex: 1; }
+    .notif-title { font-weight: 600; font-size: 15px; margin-bottom: 3px; }
+    .notif-text { font-size: 14px; color: var(--text-secondary); line-height: 1.45; }
+    .notif-time { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+
+    /* Profile */
+    .profile-header { text-align: center; padding: 32px 0 24px; }
+    .profile-avatar {
+      width: 96px; height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4285f4, #1a73e8);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; font-weight: 700;
+      margin: 0 auto 16px;
+    }
+
+    .menu-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .menu-item:last-child { border-bottom: none; }
+    .menu-item:hover { background: var(--bg); margin: 0 -24px; padding: 16px 24px; border-radius: 8px; }
+    .menu-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .menu-text { flex: 1; font-weight: 500; font-size: 15px; }
+    .menu-arrow { color: var(--text-secondary); font-size: 18px; }
+
+    @media (max-width: 1100px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+      .content { padding: 16px; }
+      .topbar { padding: 12px 16px; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">Ш</div>
+      <span class="logo-text">Школо</span>
+    </div>
+
+    <div class="student-card">
+      <div class="avatar">ИП</div>
+      <div class="student-info">
+        <h3>Иван Петров</h3>
+        <p>8.А • ПГ по ИТ</p>
+      </div>
+    </div>
+
+    <nav class="nav-menu">
+      <button class="nav-item active" data-page="home" onclick="showPage('home')">
+        <span class="icon">🏠</span> Начало
+      </button>
+      <button class="nav-item" data-page="grades" onclick="showPage('grades')">
+        <span class="icon">📊</span> Оценки
+      </button>
+      <button class="nav-item" data-page="schedule" onclick="showPage('schedule')">
+        <span class="icon">📅</span> Разписание
+      </button>
+      <button class="nav-item" data-page="absences" onclick="showPage('absences')">
+        <span class="icon">🚫</span> Отсъствия
+      </button>
+      <button class="nav-item" data-page="notifications" onclick="showPage('notifications')">
+        <span class="icon">🔔</span> Известия
+        <span class="badge" id="notif-badge">3</span>
+      </button>
+      <button class="nav-item" data-page="profile" onclick="showPage('profile')">
+        <span class="icon">⋯</span> Още
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">Демо версия • 2026</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <h1 id="page-title">Начало</h1>
+      <div class="topbar-actions">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Търсене..." />
+        </div>
+        <button class="icon-btn" onclick="showPage('notifications')">
+          🔔
+          <span class="badge" id="top-badge">3</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- HOME -->
+      <div class="page active" id="page-home">
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#e6f4ea">📈</div>
+            <div>
+              <div class="stat-value good" id="avg-grade">5.42</div>
+              <div class="stat-label">Среден успех</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fef7e0">🚫</div>
+            <div>
+              <div class="stat-value warn">3</div>
+              <div class="stat-label">Отсъствия</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#e8f0fe">📊</div>
+            <div>
+              <div class="stat-value" id="grade-count">12</div>
+              <div class="stat-label">Оценки този срок</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fce8e6">📝</div>
+            <div>
+              <div class="stat-value">2</div>
+              <div class="stat-label">Домашни</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Последни оценки</span>
+              <a class="card-link" onclick="showPage('grades')">Виж всички →</a>
+            </div>
+            <div id="home-grades"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Днес • 6 октомври</span>
+              <a class="card-link" onclick="showPage('schedule')">Пълна програма →</a>
+            </div>
+            <div class="lesson-item">
+              <div class="lesson-time"><div class="hour">08:00</div><div class="min">– 08:45</div></div>
+              <div class="lesson-dot"></div>
+              <div class="lesson-content">
+                <div class="lesson-subject">Математика</div>
+                <div class="lesson-teacher">г-жа Иванова</div>
+                <span class="lesson-room">каб. 12</span>
+              </div>
+            </div>
+            <div class="lesson-item">
+              <div class="lesson-time"><div class="hour">08:55</div><div class="min">– 09:40</div></div>
+              <div class="lesson-dot"></div>
+              <div class="lesson-content">
+                <div class="lesson-subject">Български език</div>
+                <div class="lesson-teacher">г-жа Георгиева</div>
+                <span class="lesson-room">каб. 8</span>
+              </div>
+            </div>
+            <div class="lesson-item">
+              <div class="lesson-time"><div class="hour">09:50</div><div class="min">– 10:35</div></div>
+              <div class="lesson-dot"></div>
+              <div class="lesson-content">
+                <div class="lesson-subject">Английски език</div>
+                <div class="lesson-teacher">г-жа Смит</div>
+                <span class="lesson-room">каб. 15</span>
+              </div>
+            </div>
+            <div class="lesson-item">
+              <div class="lesson-time"><div class="hour">10:55</div><div class="min">– 11:40</div></div>
+              <div class="lesson-dot"></div>
+              <div class="lesson-content">
+                <div class="lesson-subject">Информатика</div>
+                <div class="lesson-teacher">г-н Димитров</div>
+                <span class="lesson-room">каб. 21</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRADES -->
+      <div class="page" id="page-grades">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Текущ срок • I срок</span>
+            <button class="btn btn-primary" onclick="openAddGrade()">
+              ＋ Добави оценка
+            </button>
+          </div>
+          <div id="grades-list"></div>
+        </div>
+      </div>
+
+      <!-- SCHEDULE -->
+      <div class="page" id="page-schedule">
+        <div class="day-tabs">
+          <div class="day-tab active"><div class="day-name">Понеделник</div><div class="day-num">6</div></div>
+          <div class="day-tab"><div class="day-name">Вторник</div><div class="day-num">7</div></div>
+          <div class="day-tab"><div class="day-name">Сряда</div><div class="day-num">8</div></div>
+          <div class="day-tab"><div class="day-name">Четвъртък</div><div class="day-num">9</div></div>
+          <div class="day-tab"><div class="day-name">Петък</div><div class="day-num">10</div></div>
+        </div>
+        <div class="card">
+          <div class="lesson-item">
+            <div class="lesson-time"><div class="hour">08:00</div><div class="min">1 час</div></div>
+            <div class="lesson-dot"></div>
+            <div class="lesson-content">
+              <div class="lesson-subject">Математика</div>
+              <div class="lesson-teacher">г-жа Иванова</div>
+              <span class="lesson-room">каб. 12</span>
+            </div>
+          </div>
+          <div class="lesson-item">
+            <div class="lesson-time"><div class="hour">08:55</div><div class="min">2 час</div></div>
+            <div class="lesson-dot"></div>
+            <div class="lesson-content">
+              <div class="lesson-subject">Български език</div>
+              <div class="lesson-teacher">г-жа Георгиева</div>
+              <span class="lesson-room">каб. 8</span>
+            </div>
+          </div>
+          <div class="lesson-item">
+            <div class="lesson-time"><div class="hour">09:50</div><div class="min">3 час</div></div>
+            <div class="lesson-dot"></div>
+            <div class="lesson-content">
+              <div class="lesson-subject">Английски език</div>
+              <div class="lesson-teacher">г-жа Смит</div>
+              <span class="lesson-room">каб. 15</span>
+            </div>
+          </div>
+          <div class="lesson-item">
+            <div class="lesson-time"><div class="hour">10:55</div><div class="min">4 час</div></div>
+            <div class="lesson-dot"></div>
+            <div class="lesson-content">
+              <div class="lesson-subject">Информатика</div>
+              <div class="lesson-teacher">г-н Димитров</div>
+              <span class="lesson-room">каб. 21</span>
+            </div>
+          </div>
+          <div class="lesson-item">
+            <div class="lesson-time"><div class="hour">11:50</div><div class="min">5 час</div></div>
+            <div class="lesson-dot"></div>
+            <div class="lesson-content">
+              <div class="lesson-subject">Физика</div>
+              <div class="lesson-teacher">г-н Стоянов</div>
+              <span class="lesson-room">каб. 5</span>
+            </div>
+          </div>
+          <div class="lesson-item">
+            <div class="lesson-time"><div class="hour">12:45</div><div class="min">6 час</div></div>
+            <div class="lesson-dot"></div>
+            <div class="lesson-content">
+              <div class="lesson-subject">История</div>
+              <div class="lesson-teacher">г-жа Петрова</div>
+              <span class="lesson-room">каб. 3</span>
+            </div>
+          </div>
+          <div class="lesson-item">
+            <div class="lesson-time"><div class="hour">13:40</div><div class="min">7 час</div></div>
+            <div class="lesson-dot"></div>
+            <div class="lesson-content">
+              <div class="lesson-subject">Физкултура</div>
+              <div class="lesson-teacher">г-н Колев</div>
+              <span class="lesson-room">зала</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABSENCES -->
+      <div class="page" id="page-absences">
+        <div class="stats-row" style="grid-template-columns: repeat(3, 1fr);">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#f0f2f5">📋</div>
+            <div><div class="stat-value">3</div><div class="stat-label">Общо отсъствия</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#e6f4ea">✅</div>
+            <div><div class="stat-value good">2</div><div class="stat-label">Извинени</div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fce8e6">❌</div>
+            <div><div class="stat-value bad">1</div><div class="stat-label">Неизвинени</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Списък с отсъствия</span></div>
+          <div class="absence-item">
+            <div class="absence-left">
+              <div class="absence-icon excused">✅</div>
+              <div class="absence-info"><h4>Математика • 1 час</h4><p>02.10.2026 • г-жа Иванова</p></div>
+            </div>
+            <span class="absence-status excused">Извинено</span>
+          </div>
+          <div class="absence-item">
+            <div class="absence-left">
+              <div class="absence-icon excused">✅</div>
+              <div class="absence-info"><h4>Български език • 2 часа</h4><p>28.09.2026 • г-жа Георгиева</p></div>
+            </div>
+            <span class="absence-status excused">Извинено</span>
+          </div>
+          <div class="absence-item">
+            <div class="absence-left">
+              <div class="absence-icon unexcused">❌</div>
+              <div class="absence-info"><h4>Физика • 1 час</h4><p>25.09.2026 • г-н Стоянов</p></div>
+            </div>
+            <span class="absence-status unexcused">Неизвинено</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="page" id="page-notifications">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Известия</span></div>
+          <div id="notif-list">
+            <div class="notif-item unread">
+              <div class="notif-icon">📊</div>
+              <div class="notif-content">
+                <div class="notif-title">Нова оценка</div>
+                <div class="notif-text">Иван получи оценка <strong>6</strong> по Математика (контролна работа)</div>
+                <div class="notif-time">днес, 14:32</div>
+              </div>
+            </div>
+            <div class="notif-item unread">
+              <div class="notif-icon">📝</div>
+              <div class="notif-content">
+                <div class="notif-title">Ново домашно</div>
+                <div class="notif-text">Домашно по Български език – есе на тема „Есента в българската литература“</div>
+                <div class="notif-time">днес, 11:15</div>
+              </div>
+            </div>
+            <div class="notif-item unread">
+              <div class="notif-icon">🚫</div>
+              <div class="notif-content">
+                <div class="notif-title">Отсъствие</div>
+                <div class="notif-text">Иван отсъства от 1 час по Математика</div>
+                <div class="notif-time">вчера, 09:12</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon">💬</div>
+              <div class="notif-content">
+                <div class="notif-title">Съобщение от учител</div>
+                <div class="notif-text">г-жа Иванова: Моля донесете учебниците и тетрадките утре.</div>
+                <div class="notif-time">02.10, 16:40</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon">📅</div>
+              <div class="notif-content">
+                <div class="notif-title">Събитие</div>
+                <div class="notif-text">Родителска среща – 10 октомври, 18:00 ч. в залата</div>
+                <div class="notif-time">01.10, 10:00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="page" id="page-profile">
+        <div class="profile-header">
+          <div class="profile-avatar">ИП</div>
+          <h2 style="font-size:24px;margin-bottom:6px">Иван Петров</h2>
+          <p style="color:var(--text-secondary);font-size:15px">8.А клас • ПГ по информационни технологии „Г. С. Раковски“</p>
+        </div>
+        <div class="card" style="max-width:600px;margin:0 auto">
+          <div class="menu-item"><div class="menu-icon">👤</div><div class="menu-text">Профил и лични данни</div><span class="menu-arrow">›</span></div>
+          <div class="menu-item"><div class="menu-icon">👨‍👩‍👧</div><div class="menu-text">Смяна на ученик</div><span class="menu-arrow">›</span></div>
+          <div class="menu-item"><div class="menu-icon">📊</div><div class="menu-text">Статистики и справки</div><span class="menu-arrow">›</span></div>
+          <div class="menu-item"><div class="menu-icon">💬</div><div class="menu-text">Съобщения</div><span class="menu-arrow">›</span></div>
+          <div class="menu-item"><div class="menu-icon">📅</div><div class="menu-text">Календар и събития</div><span class="menu-arrow">›</span></div>
+          <div class="menu-item"><div class="menu-icon">⚙️</div><div class="menu-text">Настройки</div><span class="menu-arrow">›</span></div>
+          <div class="menu-item"><div class="menu-icon">🚪</div><div class="menu-text">Изход</div><span class="menu-arrow">›</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ADD GRADE MODAL -->
+  <div class="modal-overlay" id="grade-modal">
+    <div class="modal">
+      <h2>Добави оценка</h2>
+
+      <div class="form-group">
+        <label>Предмет</label>
+        <select id="grade-subject">
+          <option value="Математика">Математика</option>
+          <option value="Български език">Български език</option>
+          <option value="Информатика">Информатика</option>
+          <option value="Английски език">Английски език</option>
+          <option value="История">История</option>
+          <option value="Физика">Физика</option>
+          <option value="Химия">Химия</option>
+          <option value="Биология">Биология</option>
+          <option value="География">География</option>
+          <option value="Физкултура">Физкултура</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Оценка</label>
+        <div class="grade-picker" id="grade-picker">
+          <button type="button" data-g="6">6</button>
+          <button type="button" data-g="5">5</button>
+          <button type="button" data-g="4">4</button>
+          <button type="button" data-g="3">3</button>
+          <button type="button" data-g="2">2</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Тип</label>
+        <select id="grade-type">
+          <option value="Контролна работа">Контролна работа</option>
+          <option value="Тест">Тест</option>
+          <option value="Устен">Устен</option>
+          <option value="Практически урок">Практически урок</option>
+          <option value="Домашна работа">Домашна работа</option>
+          <option value="Проект">Проект</option>
+          <option value="Класна работа">Класна работа</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Учител</label>
+        <input type="text" id="grade-teacher" placeholder="напр. г-жа Иванова" value="г-жа Иванова" />
+      </div>
+
+      <div class="form-group">
+        <label>Дата</label>
+        <input type="date" id="grade-date" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeAddGrade()">Отказ</button>
+        <button class="btn btn-primary" onclick="saveGrade()">Запази оценка</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ========== DATA ==========
+    let grades = [
+      { id: 1, subject: 'Математика', grade: 6, type: 'Контролна работа', teacher: 'г-жа Иванова', date: '2026-10-02' },
+      { id: 2, subject: 'Български език', grade: 5, type: 'Тест', teacher: 'г-жа Георгиева', date: '2026-10-01' },
+      { id: 3, subject: 'Информатика', grade: 6, type: 'Практически урок', teacher: 'г-н Димитров', date: '2026-09-30' },
+      { id: 4, subject: 'История', grade: 5, type: 'Устен', teacher: 'г-жа Петрова', date: '2026-09-28' },
+      { id: 5, subject: 'Физика', grade: 4, type: 'Тест', teacher: 'г-н Стоянов', date: '2026-09-25' },
+      { id: 6, subject: 'Английски език', grade: 6, type: 'Writing', teacher: 'г-жа Смит', date: '2026-09-22' },
+      { id: 7, subject: 'Химия', grade: 5, type: 'Лабораторна', teacher: 'г-жа Николова', date: '2026-09-20' },
+      { id: 8, subject: 'Биология', grade: 6, type: 'Проект', teacher: 'г-н Василев', date: '2026-09-18' },
+      { id: 9, subject: 'География', grade: 5, type: 'Тест', teacher: 'г-жа Тодорова', date: '2026-09-15' },
+    ];
+
+    let nextId = 10;
+    let selectedGrade = null;
+
+    // ========== HELPERS ==========
+    function formatDate(iso) {
+      if (!iso) return '';
+      const [y, m, d] = iso.split('-');
+      return `${d}.${m}.${y}`;
+    }
+
+    function formatDateShort(iso) {
+      if (!iso) return '';
+      const [y, m, d] = iso.split('-');
+      return `${d}.${m}`;
+    }
+
+    function calcAverage() {
+      if (grades.length === 0) return '–';
+      const sum = grades.reduce((a, g) => a + g.grade, 0);
+      return (sum / grades.length).toFixed(2);
+    }
+
+    // ========== RENDER ==========
+    function renderGrades() {
+      // Sort by date descending
+      const sorted = [...grades].sort((a, b) => b.date.localeCompare(a.date));
+
+      // Full list
+      const list = document.getElementById('grades-list');
+      list.innerHTML = sorted.map(g => `
+        <div class="grade-item">
+          <div class="grade-circle grade-${g.grade}">${g.grade}</div>
+          <div class="grade-info">
+            <div class="grade-subject">${g.subject}</div>
+            <div class="grade-meta">${g.type} • ${formatDate(g.date)} • ${g.teacher}</div>
+          </div>
+          <button class="grade-delete" onclick="deleteGrade(${g.id})" title="Изтрий">🗑</button>
+        </div>
+      `).join('') || '<p style="color:var(--text-secondary);text-align:center;padding:30px">Няма оценки</p>';
+
+      // Home – last 4
+      const home = document.getElementById('home-grades');
+      home.innerHTML = sorted.slice(0, 4).map(g => `
+        <div class="grade-item">
+          <div class="grade-circle grade-${g.grade}">${g.grade}</div>
+          <div class="grade-info">
+            <div class="grade-subject">${g.subject}</div>
+            <div class="grade-meta">${g.type} • ${g.teacher}</div>
+          </div>
+          <div class="grade-date">${formatDateShort(g.date)}</div>
+        </div>
+      `).join('');
+
+      // Stats
+      document.getElementById('avg-grade').textContent = calcAverage();
+      document.getElementById('grade-count').textContent = grades.length;
+    }
+
+    // ========== ADD GRADE ==========
+    function openAddGrade() {
+      selectedGrade = null;
+      document.querySelectorAll('#grade-picker button').forEach(b => b.classList.remove('selected'));
+      document.getElementById('grade-subject').value = 'Математика';
+      document.getElementById('grade-type').value = 'Контролна работа';
+      document.getElementById('grade-teacher').value = 'г-жа Иванова';
+      // Today
+      const today = new Date();
+      document.getElementById('grade-date').value = today.toISOString().slice(0, 10);
+      document.getElementById('grade-modal').classList.add('open');
+    }
+
+    function closeAddGrade() {
+      document.getElementById('grade-modal').classList.remove('open');
+    }
+
+    // Grade picker
+    document.getElementById('grade-picker').addEventListener('click', e => {
+      if (e.target.tagName === 'BUTTON') {
+        document.querySelectorAll('#grade-picker button').forEach(b => b.classList.remove('selected'));
+        e.target.classList.add('selected');
+        selectedGrade = parseInt(e.target.dataset.g);
+      }
+    });
+
+    function saveGrade() {
+      if (!selectedGrade) {
+        showToast('Моля избери оценка!');
+        return;
+      }
+
+      const subject = document.getElementById('grade-subject').value;
+      const type = document.getElementById('grade-type').value;
+      const teacher = document.getElementById('grade-teacher').value || '–';
+      const date = document.getElementById('grade-date').value || new Date().toISOString().slice(0, 10);
+
+      grades.unshift({
+        id: nextId++,
+        subject,
+        grade: selectedGrade,
+        type,
+        teacher,
+        date
+      });
+
+      renderGrades();
+      closeAddGrade();
+      showToast(`Добавена оценка ${selectedGrade} по ${subject}`);
+
+      // Add notification
+      addNotification(selectedGrade, subject, type);
+    }
+
+    function deleteGrade(id) {
+      if (!confirm('Сигурен ли си, че искаш да изтриеш тази оценка?')) return;
+      grades = grades.filter(g => g.id !== id);
+      renderGrades();
+      showToast('Оценката е изтрита');
+    }
+
+    function addNotification(grade, subject, type) {
+      const list = document.getElementById('notif-list');
+      const now = new Date();
+      const time = `днес, ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const html = `
+        <div class="notif-item unread">
+          <div class="notif-icon">📊</div>
+          <div class="notif-content">
+            <div class="notif-title">Нова оценка</div>
+            <div class="notif-text">Иван получи оценка <strong>${grade}</strong> по ${subject} (${type})</div>
+            <div class="notif-time">${time}</div>
+          </div>
+        </div>
+      `;
+      list.insertAdjacentHTML('afterbegin', html);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // Close modal on overlay click
+    document.getElementById('grade-modal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeAddGrade();
+    });
+
+    // ========== NAVIGATION ==========
+    const titles = {
+      home: 'Начало',
+      grades: 'Оценки',
+      schedule: 'Разписание',
+      absences: 'Отсъствия',
+      notifications: 'Известия',
+      profile: 'Още'
+    };
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const page = document.getElementById('page-' + pageId);
+      if (page) page.classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.page === pageId);
+      });
+
+      document.getElementById('page-title').textContent = titles[pageId] || pageId;
+      window.scrollTo(0, 0);
+    }
+
+    // Day tabs
+    document.querySelectorAll('.day-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+
+    // Init
+    renderGrades();
+  </script>
+</body>
+</html>
